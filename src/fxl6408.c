@@ -1,4 +1,7 @@
 #include <msp430.h>
+#include <stdint.h>
+
+#include <libio/console.h>
 
 #include "fxl6408.h"
 
@@ -6,8 +9,8 @@
 
 #define FXL_REG_ID 0x01
 
-#define FXL_ID_MFG_MASK 0xC0
-#define FXL_ID_MFG      0x50
+#define FXL_ID_MFG_MASK 0xE0
+#define FXL_ID_MFG      0xA0
 
 
 fxl_status_t fxl_init()
@@ -35,7 +38,7 @@ fxl_status_t fxl_init()
 
   while (UCB0STATW & UCBBUSY);
 
-  if (id & FXL_ID_MFG_MASK != FXL_ID_MFG) {
+  if ((id & FXL_ID_MFG_MASK) != FXL_ID_MFG) {
     LOG("FXL: invalid MFG id: 0x%02x (expected 0x%02x)\r\n", id & FXL_ID_MFG_MASK, FXL_ID_MFG);
     return FXL_ERR_BAD_ID;
   }
