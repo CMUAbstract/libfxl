@@ -43,7 +43,7 @@ fxl_status_t fxl_init()
     return FXL_ERR_BAD_ID;
   }
 
-  LOG("LSM id: 0x%02x\r\n", id);
+  LOG("FXL: id 0x%02x\r\n", id);
 
   return FXL_SUCCESS;
 }
