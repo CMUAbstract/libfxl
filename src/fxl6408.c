@@ -72,7 +72,7 @@ fxl_status_t fxl_init()
     return FXL_ERR_BAD_ID;
   }
 
-  LOG("FXL: id 0x%02x\r\n", id);
+  LOG2("FXL: id 0x%02x\r\n", id);
 
   set_reg(FXL_REG_ID, id | FXL_ID_SW_RST); // reset to synch with local state
   out_state = 0x00;
