@@ -1,8 +1,5 @@
 LIB = libfxl
 
-#include ../Makefile.config
-#include ../Makefile.options
-
 OBJECTS = \
 	fxl6408.o \
 
@@ -14,3 +11,5 @@ override SRC_ROOT = ../../src
 override CFLAGS += \
 	-I$(SRC_ROOT)/include \
 	-I$(SRC_ROOT)/include/$(LIB) \
+
+include $(MAKER_ROOT)/Makefile.$(TOOLCHAIN)
