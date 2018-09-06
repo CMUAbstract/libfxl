@@ -8,6 +8,7 @@ OBJECTS = \
 
 DEPS += \
 	libmsp \
+  libmspware \
 
 override SRC_ROOT = ../../src
 
