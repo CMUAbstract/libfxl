@@ -21,7 +21,7 @@ static uint8_t out_state = 0x0;
 static uint8_t dir_state = 0x0;
 static uint8_t pull_state = 0x0;
 
-/*static void set_reg(unsigned reg, unsigned val)
+static void set_reg(unsigned reg, unsigned val)
 {
   UCB0CTLW0 |= UCTR | UCTXSTT; // transmit mode and start
 
@@ -40,10 +40,10 @@ static uint8_t pull_state = 0x0;
   UCB0CTLW0 |= UCTXSTP; // stop
 
   while (UCB0STATW & UCBBUSY);
-}*/
+}
 
 // TODO get rid of this!!
-static void set_reg(unsigned reg, unsigned val) {
+/*static void set_reg(unsigned reg, unsigned val) {
 	EUSCI_B_I2C_disable(EUSCI_B0_BASE);
   EUSCI_B_I2C_setSlaveAddress(EUSCI_B0_BASE, FXL_ADDR);
   EUSCI_B_I2C_setMode(EUSCI_B0_BASE, EUSCI_B_I2C_TRANSMIT_MODE);
@@ -57,7 +57,7 @@ static void set_reg(unsigned reg, unsigned val) {
   EUSCI_B_I2C_masterSendMultiByteStop(EUSCI_B0_BASE);
   while(EUSCI_B_I2C_isBusBusy(EUSCI_B0_BASE));
 }
-
+*/
 static void set_reg_safe(unsigned reg, unsigned val) {
 	EUSCI_B_I2C_disable(EUSCI_B0_BASE);
   EUSCI_B_I2C_setSlaveAddress(EUSCI_B0_BASE, FXL_ADDR);
@@ -105,10 +105,10 @@ fxl_status_t fxl_init()
 
   LOG2("FXL: id 0x%02x\r\n", id);
 
-  set_reg(FXL_REG_ID, id | FXL_ID_SW_RST); // reset to synch with local state
+  set_reg_safe(FXL_REG_ID, id | FXL_ID_SW_RST); // reset to synch with local state
   out_state = 0x00;
 
-  set_reg(FXL_REG_HIGH_Z, 0x00); // output from Output State reg, not High-Z
+  set_reg_safe(FXL_REG_HIGH_Z, 0x00); // output from Output State reg, not High-Z
 
   return FXL_SUCCESS;
 }
@@ -116,14 +116,14 @@ fxl_status_t fxl_init()
 fxl_status_t fxl_out(uint8_t bit)
 {
     dir_state |= bit;
-    set_reg(FXL_REG_IO_DIR, dir_state);
+    set_reg_safe(FXL_REG_IO_DIR, dir_state);
     return FXL_SUCCESS;
 }
 
 fxl_status_t fxl_in(uint8_t bit)
 {
     dir_state &= ~bit;
-    set_reg(FXL_REG_IO_DIR, dir_state);
+    set_reg_safe(FXL_REG_IO_DIR, dir_state);
     return FXL_SUCCESS;
 }
 
