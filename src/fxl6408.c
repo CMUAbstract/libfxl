@@ -56,7 +56,7 @@ static void set_reg_safe(unsigned reg, unsigned val)
   UCB0I2CSA = FXL_ADDR; // Set slave address
   UCB0CTLW0 &= ~UCSWRST; // enable
   while (UCB0STATW & UCBBUSY); // is bus busy? then wait!
-  
+
   UCB0CTLW0 |= UCTR | UCTXSTT; // transmit mode and start
 
   // Have to wait for addr transmission to finish, otherwise the TXIFG does not
@@ -117,11 +117,11 @@ fxl_status_t fxl_init()
   while (UCB0STATW & UCBBUSY);
 
   if ((id & FXL_ID_MFG_MASK) != FXL_ID_MFG) {
-    LOG("FXL: invalid MFG id: 0x%02x (expected 0x%02x)\r\n", id & FXL_ID_MFG_MASK, FXL_ID_MFG);
+    PRINTF("FXL: invalid MFG id: 0x%02x (expected 0x%02x)\r\n", id & FXL_ID_MFG_MASK, FXL_ID_MFG);
     return FXL_ERR_BAD_ID;
   }
 
-  LOG2("FXL: id 0x%02x\r\n", id);
+  //PRINTF("FXL: id 0x%02x\r\n", id);
 
   set_reg_safe(FXL_REG_ID, id | FXL_ID_SW_RST); // reset to synch with local state
   out_state = 0x00;
@@ -142,6 +142,13 @@ fxl_status_t fxl_in(uint8_t bit)
 {
     dir_state &= ~bit;
     set_reg_safe(FXL_REG_IO_DIR, dir_state);
+    return FXL_SUCCESS;
+}
+
+fxl_status_t fxl_set_io_reg(uint8_t val)
+{
+    dir_state = val;
+    set_reg_safe(FXL_REG_IO_DIR,dir_state);
     return FXL_SUCCESS;
 }
 

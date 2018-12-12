@@ -14,6 +14,7 @@ fxl_status_t fxl_init();
 fxl_status_t fxl_out(uint8_t bit);
 fxl_status_t fxl_in(uint8_t bit);
 fxl_status_t fxl_set(uint8_t bit);
+fxl_status_t fxl_set_io_reg(uint8_t val);
 fxl_status_t fxl_clear(uint8_t bit);
 fxl_status_t fxl_pull_up(uint8_t bit);
 fxl_status_t fxl_pull_down(uint8_t bit);
