@@ -2,7 +2,7 @@
 #include <stdint.h>
 
 #include <libio/console.h>
-
+#include <libmspware/driverlib.h>
 #include "fxl6408.h"
 
 #define FXL_ADDR 0x43 // 100 0011
@@ -42,6 +42,37 @@ static void set_reg(unsigned reg, unsigned val)
   while (UCB0STATW & UCBBUSY);
 }
 
+// TODO get rid of this!!
+/*static void set_reg(unsigned reg, unsigned val) {
+	EUSCI_B_I2C_disable(EUSCI_B0_BASE);
+  EUSCI_B_I2C_setSlaveAddress(EUSCI_B0_BASE, FXL_ADDR);
+  EUSCI_B_I2C_setMode(EUSCI_B0_BASE, EUSCI_B_I2C_TRANSMIT_MODE);
+  EUSCI_B_I2C_enable(EUSCI_B0_BASE);
+	while(EUSCI_B_I2C_isBusBusy(EUSCI_B0_BASE));
+  
+  EUSCI_B_I2C_setMode(EUSCI_B0_BASE, EUSCI_B_I2C_TRANSMIT_MODE);
+  EUSCI_B_I2C_masterSendStart(EUSCI_B0_BASE);
+  EUSCI_B_I2C_masterSendMultiByteNext(EUSCI_B0_BASE, reg);
+  EUSCI_B_I2C_masterSendMultiByteNext(EUSCI_B0_BASE, val);
+  EUSCI_B_I2C_masterSendMultiByteStop(EUSCI_B0_BASE);
+  while(EUSCI_B_I2C_isBusBusy(EUSCI_B0_BASE));
+}
+*/
+static void set_reg_safe(unsigned reg, unsigned val) {
+	EUSCI_B_I2C_disable(EUSCI_B0_BASE);
+  EUSCI_B_I2C_setSlaveAddress(EUSCI_B0_BASE, FXL_ADDR);
+  EUSCI_B_I2C_setMode(EUSCI_B0_BASE, EUSCI_B_I2C_TRANSMIT_MODE);
+  EUSCI_B_I2C_enable(EUSCI_B0_BASE);
+	while(EUSCI_B_I2C_isBusBusy(EUSCI_B0_BASE));
+  
+  EUSCI_B_I2C_setMode(EUSCI_B0_BASE, EUSCI_B_I2C_TRANSMIT_MODE);
+  EUSCI_B_I2C_masterSendStart(EUSCI_B0_BASE);
+  EUSCI_B_I2C_masterSendMultiByteNext(EUSCI_B0_BASE, reg);
+  EUSCI_B_I2C_masterSendMultiByteNext(EUSCI_B0_BASE, val);
+  EUSCI_B_I2C_masterSendMultiByteStop(EUSCI_B0_BASE);
+  while(EUSCI_B_I2C_isBusBusy(EUSCI_B0_BASE));
+}
+
 fxl_status_t fxl_init()
 {
   UCB0CTLW0 |= UCSWRST; // disable
@@ -74,10 +105,10 @@ fxl_status_t fxl_init()
 
   LOG2("FXL: id 0x%02x\r\n", id);
 
-  set_reg(FXL_REG_ID, id | FXL_ID_SW_RST); // reset to synch with local state
+  set_reg_safe(FXL_REG_ID, id | FXL_ID_SW_RST); // reset to synch with local state
   out_state = 0x00;
 
-  set_reg(FXL_REG_HIGH_Z, 0x00); // output from Output State reg, not High-Z
+  set_reg_safe(FXL_REG_HIGH_Z, 0x00); // output from Output State reg, not High-Z
 
   return FXL_SUCCESS;
 }
@@ -85,14 +116,14 @@ fxl_status_t fxl_init()
 fxl_status_t fxl_out(uint8_t bit)
 {
     dir_state |= bit;
-    set_reg(FXL_REG_IO_DIR, dir_state);
+    set_reg_safe(FXL_REG_IO_DIR, dir_state);
     return FXL_SUCCESS;
 }
 
 fxl_status_t fxl_in(uint8_t bit)
 {
     dir_state &= ~bit;
-    set_reg(FXL_REG_IO_DIR, dir_state);
+    set_reg_safe(FXL_REG_IO_DIR, dir_state);
     return FXL_SUCCESS;
 }
 
@@ -113,13 +144,13 @@ fxl_status_t fxl_pull_down(uint8_t bit)
 fxl_status_t fxl_set(uint8_t bit)
 {
     out_state |= bit;
-    set_reg(FXL_REG_OUT_STATE, out_state);
+    set_reg_safe(FXL_REG_OUT_STATE, out_state);
     return FXL_SUCCESS;
 }
 
 fxl_status_t fxl_clear(uint8_t bit)
 {
     out_state &= ~bit;
-    set_reg(FXL_REG_OUT_STATE, out_state);
+    set_reg_safe(FXL_REG_OUT_STATE, out_state);
     return FXL_SUCCESS;
 }
