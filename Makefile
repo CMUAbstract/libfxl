@@ -1,5 +1,7 @@
 LIB = libfxl
 
+DEVICE = msp430fr5949
+
 OBJECTS = \
 	fxl6408.o \
 
